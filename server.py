@@ -1,10 +1,12 @@
-import os
 from flask import Flask, jsonify, Response
+from flask_cors import CORS        # ← añade esto
 import requests
+import os
 
 app = Flask(__name__)
-SESSION = requests.Session()
+CORS(app)                          # ← y esto para habilitar CORS globalmente
 
+SESSION = requests.Session()
 ACTIVATE_URL = 'https://tv.teleclub.xyz/api/activar'
 LIST_URL     = 'https://tv.teleclub.xyz/tv/lista.m3u'
 
@@ -15,7 +17,7 @@ def activate():
     try:
         return jsonify(resp.json())
     except ValueError:
-        return jsonify({"result": resp.text})
+        return jsonify({ "result": resp.text })
 
 @app.route('/playlist')
 def playlist():
