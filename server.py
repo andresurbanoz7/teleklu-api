@@ -7,7 +7,7 @@ app = Flask(__name__)
 CORS(app)                          # ← y esto para habilitar CORS globalmente
 
 SESSION = requests.Session()
-ACTIVATE_URL = 'ACTIVATE_URL = 'https://tv.teleclub.xyz/activar'
+ACTIVATE_URL = 'https://tv.teleclub.xyz/activar'
 LIST_URL     = 'https://tv.teleclub.xyz/tv/lista.m3u'
 
 @app.route('/activate')
