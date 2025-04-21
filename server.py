@@ -7,17 +7,18 @@ app = Flask(__name__)
 CORS(app)                          # ← y esto para habilitar CORS globalmente
 
 SESSION = requests.Session()
-ACTIVATE_URL = 'https://tv.teleclub.xyz/api/activar'
+ACTIVATE_URL = 'ACTIVATE_URL = 'https://tv.teleclub.xyz/activar'
 LIST_URL     = 'https://tv.teleclub.xyz/tv/lista.m3u'
 
 @app.route('/activate')
 def activate():
-    resp = SESSION.get(ACTIVATE_URL)
+    # 1) Hace un POST a /activar para que Teleclub devuelva la cookie de activación
+    resp = SESSION.post(ACTIVATE_URL)
     resp.raise_for_status()
-    try:
-        return jsonify(resp.json())
-    except ValueError:
-        return jsonify({ "result": resp.text })
+    # 2) Si quieres ver el HTML de confirmación, podrías devolver resp.text,
+    #    pero lo más limpio es devolver un JSON claro al cliente:
+    return jsonify({ "result": "ACTIVACIÓN EXITOSA" })
+
 
 @app.route('/playlist')
 def playlist():
