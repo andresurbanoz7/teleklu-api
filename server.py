@@ -1,45 +1,28 @@
-from flask import Flask, jsonify
-from flask_cors import CORS
-import asyncio
-from playwright.async_api import async_playwright
+import os
+from flask import Flask, jsonify, Response
+import requests
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+SESSION = requests.Session()
 
+ACTIVATE_URL = 'https://tv.teleclub.xyz/api/activar'
+LIST_URL     = 'https://tv.teleclub.xyz/tv/lista.m3u'
 
 @app.route('/activate')
 def activate():
-    result = asyncio.run(activar_teleclub())
-    return jsonify(result)
+    resp = SESSION.get(ACTIVATE_URL)
+    resp.raise_for_status()
+    try:
+        return jsonify(resp.json())
+    except ValueError:
+        return jsonify({"result": resp.text})
 
-async def activar_teleclub():
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-        page = await browser.new_page()
-
-        try:
-            await page.goto("https://tv.teleclub.xyz/activar", timeout=30000)
-
-            # Espera al botón y hace clic dos veces (como en el navegador)
-            await page.wait_for_selector("img", timeout=10000)
-            await page.click("img")
-            await page.wait_for_timeout(3000)
-            await page.click("img")
-
-            # Espera el mensaje de activación (puedes ajustar el selector según la estructura real)
-            await page.wait_for_selector("body", timeout=10000)
-            texto = await page.inner_text("body")
-
-            await browser.close()
-            return {"status": "Activación completa", "mensaje": texto}
-
-        except Exception as e:
-            await browser.close()
-            return {"status": "Error", "detalle": str(e)}
+@app.route('/playlist')
+def playlist():
+    resp = SESSION.get(LIST_URL)
+    resp.raise_for_status()
+    return Response(resp.text, mimetype='application/x-mpegURL')
 
 if __name__ == '__main__':
-   import os
-port = int(os.environ.get("PORT", 8080))
-app.run(host='0.0.0.0', port=port)
-
-
+    port = int(os.environ.get('PORT', 8000))
+    app.run(host='0.0.0.0', port=port)
