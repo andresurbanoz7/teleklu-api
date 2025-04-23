@@ -1,4 +1,4 @@
-Flask>=2.0
-requests>=2.0
-flask-cors>=4.0
+flask
+requests
+playwright
 
