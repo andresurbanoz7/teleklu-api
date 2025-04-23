@@ -4,7 +4,8 @@ import asyncio
 from playwright.async_api import async_playwright
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
+
 
 @app.route('/activate')
 def activate():
